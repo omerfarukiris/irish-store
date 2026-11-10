@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="form-page registration-page">
+    <p class="eyebrow">IRISH STORE’A KATIL</p>
+    <h1>Tanıştığımıza sevindik.</h1>
+    <p class="registration-intro">Hesabını oluştur, sepetini ve deneme siparişlerini tek yerden takip et.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="registration-fields">
+        {% for field in form %}
+            <div class="registration-field {% if field.name == 'first_name' or field.name == 'last_name' %}name-field{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }} <span aria-hidden="true">*</span></label>
+                {{ field }}
+                {{ field.errors }}
+                {% if field.help_text %}<div class="helptext" id="{{ field.auto_id }}_helptext">{{ field.help_text|safe }}</div>{% endif %}
+            </div>
+        {% endfor %}
+        </div>
+        <p class="helptext">* Tüm alanlar zorunludur. Giriş yaparken kullanıcı adını kullanacaksın.</p>
+        <button class="primary-button" type="submit">Hesabımı oluştur →</button>
+    </form>
+    <p>Zaten üye misin? <a href="{% url 'store:login' %}">Giriş yap</a></p>
+</section>
+{% endblock %}

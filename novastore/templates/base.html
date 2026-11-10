@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Irısh Store</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=7">
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">İçeriğe geç</a>
+    <header class="site-header">
+      <div class="header-note">IRISH EDITION <span>Günlük stilin, doğal hâli.</span></div>
+      <nav class="main-nav" aria-label="Ana menü">
+        <a href="{% url 'store:index' %}" class="nav-logo" aria-label="Irısh Store ana sayfa"><span class="brand-mark" aria-hidden="true">I<span>·</span></span><span class="brand-wordmark">IRISH <em>STORE</em><small>ESSENTIALS & EVERYDAY</small></span></a>
+        <button type="button" class="menu-toggle" aria-expanded="true" aria-controls="primary-links" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menü</span></button>
+        <div class="nav-links" id="primary-links">
+          <a href="{% url 'store:product_list' %}" {% if request.resolver_match.url_name == 'product_list' and not request.GET.selected_category %}aria-current="page"{% endif %}>Tüm Ürünler</a>
+          <a href="{% url 'store:new_arrivals' %}" {% if request.resolver_match.url_name == 'new_arrivals' %}aria-current="page"{% endif %}>Yeni Gelenler <span class="nav-new-dot" aria-hidden="true"></span></a>
+          <a href="{% url 'store:product_list' %}?selected_category=erkek" {% if request.resolver_match.url_name == 'product_list' and request.GET.selected_category == 'erkek' %}aria-current="page"{% endif %}>Erkek</a>
+          <a href="{% url 'store:product_list' %}?selected_category=kadin" {% if request.resolver_match.url_name == 'product_list' and request.GET.selected_category == 'kadin' %}aria-current="page"{% endif %}>Kadın</a>
+          <a href="{% url 'store:product_list' %}?selected_category=aksesuar" {% if request.resolver_match.url_name == 'product_list' and request.GET.selected_category == 'aksesuar' %}aria-current="page"{% endif %}>Aksesuar</a>
+        </div>
+        <div class="nav-actions">
+          <a href="{% url 'store:product_list' %}#catalog-search" class="nav-action-card">
+            <span class="nav-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5" stroke-linecap="round"/></svg></span>
+            <span class="nav-action-copy"><strong>Ara</strong><small>Favori parçanı keşfet</small></span>
+          </a>
+          <a href="{% url 'store:account' %}" class="nav-action-card">
+            <span class="nav-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2" stroke-linecap="round"/></svg></span>
+            <span class="nav-action-copy"><strong>Hesabım</strong><small>Sana özel alan</small></span>
+          </a>
+          <a href="{% url 'store:cart_detail' %}" class="cart-nav" aria-label="Sepetim, {{ cart_quantity }} adet ürün">
+            <span class="cart-icon"><svg width="21" height="23" viewBox="0 0 24 26" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 8h14l2 16H3L5 8Z" stroke-linejoin="round"/><path d="M8 10V6a4 4 0 0 1 8 0v4" stroke-linecap="round"/></svg><span class="cart-badge">{{ cart_quantity }}</span></span>
+            <span class="cart-nav-copy"><strong>Sepetim</strong><small>{% if cart_quantity %}{{ cart_quantity }} parça seçildi{% else %}Koleksiyonunu oluştur{% endif %}</small></span>
+            <span class="cart-nav-arrow" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+    <main id="main-content">
+      {% if request.resolver_match.url_name != 'product_detail' %}{% for message in messages %}<div class="global-message {{ message.tags }}" role="status">{{ message }}</div>{% endfor %}{% endif %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer"><div><a class="footer-brand" href="{% url 'store:index' %}">IRISH STORE</a><p>Sade parçalar. Sana ait bir stil.</p></div><div><a href="{% url 'store:product_list' %}">Koleksiyon</a><a href="{% url 'store:account' %}">Hesabım</a><a href="{% url 'store:cart_detail' %}">Sepetim</a></div><small>Deneme mağazası · Gerçek ödeme ve gönderim yapılmaz.</small></footer>
+    <script>
+      const menuButton = document.querySelector('.menu-toggle');
+      const siteHeader = document.querySelector('.site-header');
+      menuButton.hidden = false;
+      function closeMenu() {
+        siteHeader.dataset.menu = 'closed';
+        menuButton.setAttribute('aria-expanded', 'false');
+      }
+      closeMenu();
+      menuButton.addEventListener('click', () => {
+        const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+        siteHeader.dataset.menu = isOpen ? 'closed' : 'open';
+        menuButton.setAttribute('aria-expanded', String(!isOpen));
+      });
+      siteHeader.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') {
+          closeMenu();
+          menuButton.focus();
+        }
+      });
+    </script>
+  </body>
+</html>

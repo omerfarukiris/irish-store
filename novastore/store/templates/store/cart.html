@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'store/store.css' %}?v=6">{% endblock %}
+{% block content %}
+<section class="cart-page">
+<a class="cart-back" href="{% url 'store:product_list' %}">← Alışverişe devam et</a>
+<div class="cart-heading"><div><p class="cart-eyebrow">IRISH STORE</p><h1>Güzel seçimler.</h1><p class="cart-intro">Sevdiğin parçalar, tek bir yerde.</p></div><span>{{ cart_product_count }} farklı ürün · {{ cart_quantity }} adet</span></div>
+{% if items %}
+<div class="cart-layout"><div class="cart-products">
+{% for item in items %}
+<article class="cart-row">
+<a href="{% url 'store:product_detail' item.product.pk %}"><img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"></a>
+<div class="cart-row-info"><p class="cart-eyebrow">{{ item.product.get_category_display }}</p>
+<h2><a href="{% url 'store:product_detail' item.product.pk %}">{{ item.product.name }}</a></h2>
+<p class="cart-muted">Beden: {{ item.size|default:"Seçilmedi" }} · Adet: {{ item.quantity }}</p>
+<p class="cart-muted">Birim fiyat: ₺{{ item.product.price }}</p>
+{% if item.unavailable %}<p class="cart-warning">Bu ürün için yeterli stok yok veya ürün artık satışta değil.</p>{% endif %}
+<div class="cart-controls"><form method="post" action="{% url 'store:update_cart' item.product.pk %}">{% csrf_token %}<label for="qty-{{ item.product.pk }}">Adet</label><input id="qty-{{ item.product.pk }}" type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" required><button>Güncelle</button></form><form method="post" action="{% url 'store:remove_from_cart' item.product.pk %}">{% csrf_token %}<button class="remove-button">Kaldır</button></form></div>
+<a class="cart-edit" href="{% url 'store:product_detail' item.product.pk %}">Seçimi düzenle</a></div>
+<strong class="cart-row-price">₺{{ item.subtotal }}</strong>
+</article>
+{% endfor %}</div>
+<aside class="cart-summary"><p class="cart-eyebrow">SEÇKİNİN ÖZETİ</p><h2>Sepetim</h2>
+<div class="cart-summary-line"><span>Ürünler ({{ cart_quantity }} adet)</span><span>₺{{ total }}</span></div>
+<div class="cart-summary-line cart-muted"><span>Kargo</span><span>Henüz hesaplanmadı</span></div>
+<div class="cart-summary-total"><span>Ara toplam</span><strong>₺{{ total }}</strong></div>
+<p class="cart-muted">Bu mağazada yalnızca deneme siparişi oluşturulur. Ödeme alınmaz.</p><a class="primary-button" href="{% url 'store:checkout' %}">Deneme siparişi oluştur →</a>
+<a class="cart-continue" href="{% url 'store:product_list' %}">Alışverişe devam et →</a></aside></div>
+{% else %}
+<div class="cart-empty"><h2>Sepetiniz henüz boş.</h2><p>Beğendiğiniz parçaları keşfedin ve sepetinize ekleyin.</p><a class="cart-continue" href="{% url 'store:product_list' %}">Koleksiyonu keşfet →</a></div>
+{% endif %}</section>
+{% endblock %}

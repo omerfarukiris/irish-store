@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'store/store.css' %}?v=7">
+{% endblock %}
+{% block content %}
+    <section class="new-arrivals-page">
+        <p class="eyebrow">KENDİ STİLİNİ KEŞFET</p><h1>{{ page_title }}</h1><p class="catalog-count">{{ page_obj.paginator.count }} ürün bulundu</p>
+        <nav class="category-filters" aria-label="Ürün kategorileri">
+            <a href="{% url list_url_name %}"
+               class="{% if not selected_category %}active{% endif %}">Tümü</a>
+            <a href="{% url list_url_name %}?q={{ query|urlencode }}&amp;sort={{ sort|urlencode }}&amp;selected_type={{ selected_type|default:''|urlencode }}&amp;selected_category=erkek"
+               class="{% if selected_category == 'erkek' %}active{% endif %}">Erkek</a>
+            <a href="{% url list_url_name %}?q={{ query|urlencode }}&amp;sort={{ sort|urlencode }}&amp;selected_type={{ selected_type|default:''|urlencode }}&amp;selected_category=kadin"
+               class="{% if selected_category == 'kadin' %}active{% endif %}">Kadın</a>
+            <a href="{% url list_url_name %}?q={{ query|urlencode }}&amp;sort={{ sort|urlencode }}&amp;selected_type={{ selected_type|default:''|urlencode }}&amp;selected_category=aksesuar"
+               class="{% if selected_category == 'aksesuar' %}active{% endif %}">Aksesuar</a>
+        </nav>
+        <form method="get" class="type-filter-form" id="catalog-search">
+<label for="search-query">Ürün ara</label><input id="search-query" name="q" type="search" value="{{ query }}" placeholder="Gömlek, çanta, kazak…" maxlength="100">
+<label for="sort">Sırala</label><select id="sort" name="sort"><option value="recommended">Önerilen</option><option value="newest" {% if sort == 'newest' %}selected{% endif %}>En yeni</option><option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Fiyat: düşükten yükseğe</option><option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Fiyat: yüksekten düşüğe</option></select>
+            <input type="hidden"
+                   name="selected_category"
+                   value="{{ selected_category|default:'' }}">
+            <label for="type-filter">Ürün türü</label>
+            <select id="type-filter" name="selected_type">
+                <option value="" {% if not selected_type %}selected{% endif %}>Tüm türler</option>
+                {% for value, label in product_type_choices %}
+                    <option value="{{ value }}"
+                            {% if selected_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Uygula</button><a class="filter-reset" href="{% url list_url_name %}">Temizle</a>
+        </form>
+        <div class="product-grid">
+            {% for product in products %}
+                <article class="product-card">
+                    <a href="{% url 'store:product_detail' product.id %}" class="product-link">
+                        <img loading="lazy" src="{{ product.image.url }}" alt="{{ product.name }}">
+                    </a>
+                    <h3><a href="{% url 'store:product_detail' product.id %}" class="product-link">{{ product.name }}</a></h3>
+                    <p>₺{{ product.price }}</p>
+                </article>
+            {% empty %}
+                <p>Seçtiğiniz filtrelere uygun ürün bulunamadı.</p>
+            {% endfor %}
+        </div>
+        <div class="pagination">
+            <div class="pagination-prev">
+                {% if page_obj.has_previous %}
+                    <a href="{% url list_url_name %}?page={{ page_obj.previous_page_number }}&amp;{{ filter_query }}">Önceki Sayfa</a>
+                {% endif %}
+            </div>
+            <span>Sayfa {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span><div class="pagination-next">
+                {% if page_obj.has_next %}
+                    <a href="{% url list_url_name %}?page={{ page_obj.next_page_number }}&amp;{{ filter_query }}">Sonraki Sayfa</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

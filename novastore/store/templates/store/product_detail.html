@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'store/store.css' %}?v=6">
+{% endblock %}
+{% block content %}
+    <div class="product-detail">
+        <div class="product-detail-image">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        </div>
+        <div class="product-detail-info">
+            <a class="product-detail-back" href="{% url 'store:new_arrivals' %}">← Ürünlere dön</a>
+            <p class="product-detail-category">{{ product.get_category_display }} {{ product.get_product_type_display }}</p>
+            <h1>{{ product.name }}</h1>
+            {% for message in messages %}
+                <div class="cart-feedback" role="status"><strong>✓ Sepetiniz güncellendi</strong><p>{{ message }}</p><a href="{% url 'store:cart_detail' %}">Sepeti görüntüle · {{ cart_quantity }} adet →</a></div>
+            {% endfor %}
+            <p class="product-detail-price">₺{{ product.price }}</p>
+            {% if product.stock > 0 %}
+                <p class="product-detail-stock">Stokta</p>
+            {% else %}
+                <p class="product-detail-stock is-unavailable">Stokta yok</p>
+            {% endif %}
+            <section class="product-detail-summary" aria-labelledby="description-heading">
+                <h2 id="description-heading">Ürün hakkında</h2>
+                <p class="product-detail-description">{{ product.description }}</p>
+            </section>
+            <form method="post" action="{% url 'store:add_to_cart' product.id %}">
+                {% csrf_token %}
+            <div class="quantity-field">
+                <label for="size">Beden</label>
+                <select name="size" id="size" class="product-size" aria-describedby="size-note" {% if not product.stock %}disabled{% endif %}>
+                    <option value="">Beden seçin</option>
+                    {% if product.category == 'aksesuar' %}
+                    <option value="standart">Standart</option>
+                    {% else %}
+                    <option value="s">S</option>
+                    <option value="m">M</option>
+                    <option value="l">L</option>
+                    <option value="xl">XL</option>
+                    <option value="xxl">XXL</option>
+                    {% endif %}
+                </select>
+                <p id="size-note" class="product-purchase-note">Beden tercihiniz sepete kaydedilir. Stok bilgisi ürünün toplam stoğudur.</p>
+            </div>
+            <div class="quantity-field">
+                <label for="quantity">Adet</label>
+                <input id="quantity"
+                       name="quantity"
+                       type="number"
+                       value="1"
+                       min="1"
+                       max="{{ product.stock }}"
+                       {% if not product.stock %}disabled{% endif %}>
+            </div>
+            <div class="product-cart-action">
+                <button class="add-to-cart" type="submit" {% if not product.stock %}disabled{% endif %} aria-describedby="cart-note">{% if product.stock %}Sepete Ekle{% else %}Stokta Yok{% endif %}</button>
+                <p id="cart-note" class="product-purchase-note">Aynı ürünü tekrar eklerseniz sepetteki adet ve beden son seçiminizle değiştirilir.</p>
+            </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

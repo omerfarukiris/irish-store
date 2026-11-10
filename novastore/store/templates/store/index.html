@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'store/store.css' %}?v=6">
+{% endblock %}
+{% block content %}
+    <section class="hero">
+        <div class="hero-content">
+            <p class="hero-eyebrow">YENİ SEZON / 2026</p>
+            <h1>Yeni Koleksiyonu Keşfet</h1>
+            <p class="hero-description">
+                Sade çizgiler, rahat dokular. Her gününe eşlik edecek
+                yeni parçaları keşfet.
+            </p>
+            <a href="{% url 'store:product_list' %}" class="hero-cta">Koleksiyonu Keşfet →</a>
+            <a href="{% url 'store:new_arrivals' %}" class="hero-secondary-link">Yeni Gelenler</a>
+        </div>
+        <div class="hero-media">
+            <img src="{% static 'store/images/novastore-hero.png' %}"
+                 alt="Yeni sezon kadın koleksiyonu">
+        </div>
+    </section>
+    <section class="categories">
+        <h2>Koleksiyonları Keşfet</h2>
+        <div class="category-grid">
+            <a href="{% url 'store:product_list' %}?selected_category=kadin" class="category-card">
+                <img src="{% static 'store/images/hero-women.png' %}"
+                     alt="Kadın koleksiyonu">
+                <h3>Kadın</h3>
+            </a>
+            <a href="{% url 'store:product_list' %}?selected_category=erkek" class="category-card">
+                <img src="{% static 'store/images/hero-man.png' %}"
+                     alt="Erkek koleksiyonu">
+                <h3>Erkek</h3>
+            </a>
+            <a href="{% url 'store:product_list' %}?selected_category=aksesuar" class="category-card">
+                <img src="{% static 'store/images/hero-accessories.png' %}"
+                     alt="Aksesuar koleksiyonu">
+                <h3>Aksesuar</h3>
+            </a>
+        </div>
+    </section>
+    <section class="new-arrivals">
+        <div class="section-heading">
+            <h2>Yeni Gelenler</h2>
+            <a href="{% url 'store:new_arrivals' %}" class="view-all">Tüm Yeni Gelenler →</a>
+        </div>
+        <div class="product-grid">
+            {% for product in products %}
+                <article class="product-card">
+                    <a href="{% url 'store:product_detail' product.id %}" class="product-link">
+                        <img loading="lazy" src="{{ product.image.url }}" alt="{{ product.name }}">
+                    </a>
+                    <h3><a href="{% url 'store:product_detail' product.id %}" class="product-link">{{ product.name }}</a></h3>
+                    <p>₺{{ product.price }}</p>
+                </article>
+            {% empty %}
+                <p>Son 30 günde eklenen ürün bulunmuyor. <a href="{% url 'store:product_list' %}">Tüm ürünleri keşfet</a></p>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

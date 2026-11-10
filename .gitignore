@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.sqlite3-journal
+.env
+.DS_Store
+novastore/media/
+staticfiles/
+.env.*
+!.env.example
+.venv-*/
+.pytest_cache/
+.coverage
+htmlcov/
+backups/
+*.sql
+*.sql.gz
+*.log
+
+# Local study plans and mentoring notes
+10_GUNLUK_PROGRAM.md
+DEGISIKLIK_NOTLARI.md
+README_DjangoTweet_ve_Eticaret_YolHaritasi.md

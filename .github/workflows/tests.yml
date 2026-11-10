@@ -1,0 +1,56 @@
+name: Django checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  sqlite:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SECRET_KEY: ci-only-placeholder-key-not-for-production-irish-store
+      DJANGO_DEBUG: 'false'
+      DB_ENGINE: sqlite
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - run: python novastore/manage.py check
+      - run: python novastore/manage.py makemigrations --check --dry-run
+      - run: python novastore/manage.py test store
+  mysql:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci-only-mysql-password
+          MYSQL_DATABASE: irish_store
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DJANGO_SECRET_KEY: ci-only-placeholder-key-not-for-production-irish-store
+      DB_ENGINE: mysql
+      DB_NAME: irish_store
+      # CI root creates/drops the isolated test database; use a limited user in deployment.
+      DB_USER: root
+      DB_PASSWORD: ci-only-mysql-password
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: sudo apt-get update && sudo apt-get install -y default-libmysqlclient-dev build-essential pkg-config
+      - run: python -m pip install -r requirements-mysql.txt
+      - run: python novastore/manage.py check --database default
+      - run: python novastore/manage.py migrate --noinput
+      - run: python novastore/manage.py test store
